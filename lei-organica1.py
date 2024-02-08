@@ -1,5 +1,6 @@
 import pandas as pd 
 import re 
+import requests 
 import nltk 
 
 # access the website 
@@ -8,4 +9,4 @@ import nltk
 
 # parse through text 
 
-# extract desired text 
+# extract desired text "atos administrativos de competência do Prefeito
