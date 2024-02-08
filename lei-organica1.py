@@ -5,12 +5,17 @@ from bs4 import BeautifulSoup
 import nltk 
 
 # access the website 
-page = requests.get('https://leismunicipais.com.br/lei-organica-cordeiro-rj')
+url = 'https://leismunicipais.com.br/lei-organica-cordeiro-rj'
+page = requests.get(url)
 html = page.text 
-print (html) 
+# print (html) 
 
 # import text from website into usable form 
 
 # parse through text 
+pattern = re.compile(r'atos administrativos de competência do Prefeito') 
+matches = pattern.findall(html)
 
-# extract desired text "atos administrativos de competência do Prefeito
+# extract desired text "atos administrativos de competência do Prefeito" 
+for match in matches: 
+    print(match) 
