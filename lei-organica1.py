@@ -10,8 +10,6 @@ page = requests.get(url)
 html = page.text 
 # print (html) 
 
-# import text from website into usable form 
-
 # parse through text 
 pattern = re.compile(r'atos administrativos de competência do Prefeito') 
 matches = pattern.findall(html)
