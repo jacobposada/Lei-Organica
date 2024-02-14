@@ -14,14 +14,20 @@ html = page.text
 
 # define the regex pattern to detect and compile 
 ## multiline allows ^ and $ to match the start and end of lines in the pattern 
-pattern = re.compile(r'[IVXLCDM]+ - (.*?)<br', re.MULTILINE) 
+pattern = re.compile(r'([IVXLCDM]+ - .*?)<', re.MULTILINE) 
 
 
 # find all the matches 
 matches = pattern.findall(html) 
 
 
+# create pandas dataframe 
+laws_df = pd.DataFrame(matches, columns=['Match'])
+
+
 # print out the matched lines 
-for match in matches: 
-    print("Match:", match) 
-print('end')
+print (laws_df) 
+# for match in matches: 
+    # print("Match:", match) 
+# print('end')
+
