@@ -14,7 +14,7 @@ html = page.text
 
 # define the regex pattern to detect and compile 
 ## multiline allows ^ and $ to match the start and end of lines in the pattern 
-pattern = re.compile(r'^\s*(I|II|III|IV|V|VI|VII|VIII|IX|X)\s* -\s*.*$', re.MULTILINE) 
+pattern = re.compile(r'[IVXLCDM]+ - (.*?)<br', re.MULTILINE) 
 
 
 # find all the matches 
@@ -23,5 +23,5 @@ matches = pattern.findall(html)
 
 # print out the matched lines 
 for match in matches: 
-    print(match) 
-print('done')
+    print("Match:", match) 
+print('end')
