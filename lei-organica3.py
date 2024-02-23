@@ -1,0 +1,71 @@
+import pandas as pd 
+import re 
+import requests 
+from bs4 import BeautifulSoup 
+import nltk 
+
+
+# access the website html 
+url = 'https://leismunicipais.com.br/lei-organica-cordeiro-rj'
+page = requests.get(url)
+html = page.text 
+# print (html) 
+
+
+def extract_law_text(soup: str) -> str:
+    
+    # extracts the law text from the HTML
+
+    try:
+        # find beginning of text to extract
+        initial_index = re.search("atos administrativos de competência do Prefeito", soup).end()
+
+        # storing the remaining text
+        remaining_text = soup[initial_index:]
+
+        # obtaining final index
+        final_index = re.search("artigo", remaining_text).start()
+
+        # updating remaining text
+        remaining_text = remaining_text[:final_index]
+
+        return remaining_text
+    
+    except:
+        return None
+
+
+def extract_data(html_string): 
+
+    # parse html 
+    soup = BeautifulSoup(html_string, 'html.parser')
+
+    # extract text from html 
+    text = soup.get_text() 
+
+    # split text into sections 
+    section_split = re.split(r'\b(?=[IVXLCDM]+\b)', text) 
+    section_split = [section.strip() for section in section_split if section.strip()]
+
+    # extract subsections for each section 
+    law_sections = []
+    for section in section_split: 
+        # extract roman numeral 
+        roman_numeral_match = section[:section.index(' ')]
+
+        subsections = re.findall(r'([a-z])\)\s*(.*?)\s*(?=[a-z]+\)|$)', section, re.IGNORECASE) 
+        for subsection in subsections: 
+            law_sections.append({'Roman Numeral': roman_numeral_match, 'Subsection': subsection}) 
+    
+    return law_sections  
+
+
+# create pandas dataframe 
+# laws_df = pd.DataFrame(matches, columns=['Match'])
+
+
+# print out the matched lines 
+section_of_interest = extract_law_text(html) 
+
+extracted_data = extract_data(section_of_interest) 
+print(extracted_data) 
