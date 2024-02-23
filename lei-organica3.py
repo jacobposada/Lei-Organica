@@ -50,22 +50,25 @@ def extract_data(html_string):
     # extract subsections for each section 
     law_sections = []
     for section in section_split: 
+
         # extract roman numeral 
         roman_numeral_match = section[:section.index(' ')]
+        
+        # isolate all the subsections 
+        subsections = re.findall(r'([a-z]\) (.*?) (?=[a-z]+\)))', section, re.IGNORECASE) 
 
-        subsections = re.findall(r'([a-z])\)\s*(.*?)\s*(?=[a-z]+\)|$)', section, re.IGNORECASE) 
+        # append to law_sections the roman numeral and subsection combinations 
         for subsection in subsections: 
             law_sections.append({'Roman Numeral': roman_numeral_match, 'Subsection': subsection}) 
     
     return law_sections  
 
 
-# create pandas dataframe 
-# laws_df = pd.DataFrame(matches, columns=['Match'])
-
-
 # print out the matched lines 
 section_of_interest = extract_law_text(html) 
-
 extracted_data = extract_data(section_of_interest) 
-print(extracted_data) 
+#print(extracted_data) 
+
+# create pandas dataframe 
+laws_df = pd.DataFrame(extracted_data) 
+print(laws_df) 
