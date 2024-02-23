@@ -15,6 +15,7 @@ html = page.text
 # define the regex pattern to detect and compile 
 ## multiline allows ^ and $ to match the start and end of lines in the pattern 
 pattern = re.compile(r'([IVXLCDM]+ - .*?)<', re.MULTILINE) 
+sublist_pattern = re.compile(r'([a-z]\) .*?)<')
 
 
 # find all the matches 
@@ -30,4 +31,3 @@ print (laws_df)
 # for match in matches: 
     # print("Match:", match) 
 # print('end')
-
