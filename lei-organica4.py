@@ -55,16 +55,16 @@ def extract_data(html_string):
         section_numeral = section[:section.index(' ')] 
 
         # roman numeral string 
-        section_content = section[section.index(' '):section.index(': )')]
+        section_content = section[section.index(' ')+3:section.index(':')]
         
         # isolate all the subsections 
-        subsections = re.findall(r'([a-z]\) (.*?) (?=[a-z]+\)))', section, re.IGNORECASE) 
+        subsections = re.findall(r'([a-z]\) (.+?)(?=[a-z]\)|$))', section) 
 
         # append to law_sections the roman numeral and subsection combinations 
         for subsection in subsections: 
-            subsection_letter = subsection[:subsection.index(')')] 
-            subsection_content = subsection[subsection.index(')'):subsection.index(':')]
-            law_sections.append({'Section Number': section_numeral, 'Section Content': section_content, 'Subsection Letter': subsection_letter, 'Subsection Content': subsection_content}) 
+            subsec_letter, subsec_content = subsection 
+            subsec_letter = subsec_letter[:1]
+            law_sections.append({'Section Number': section_numeral, 'Section Content': section_content, 'Subsection Letter': subsec_letter, 'Subsection Content': subsec_content}) 
     
     return law_sections  
 
