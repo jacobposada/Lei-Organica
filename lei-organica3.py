@@ -72,3 +72,4 @@ extracted_data = extract_data(section_of_interest)
 # create pandas dataframe 
 laws_df = pd.DataFrame(extracted_data) 
 print(laws_df) 
+laws_df.to_excel('laws_data.xlsx') 
