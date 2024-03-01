@@ -2,17 +2,10 @@ import pandas as pd
 import re 
 import requests 
 from bs4 import BeautifulSoup 
-import nltk 
+import csv 
 
 
-# access the website html 
-url = 'https://leismunicipais.com.br/lei-organica-cordeiro-rj'
-page = requests.get(url)
-html = page.text 
-# print (html) 
-
-
-def extract_law_text(soup: str) -> str:
+def extract_relevant_text(soup: str) -> str:
     
     # extracts the law text from the HTML
 
@@ -27,9 +20,9 @@ def extract_law_text(soup: str) -> str:
         final_index = re.search("artigo", remaining_text).start()
 
         # updating remaining text
-        remaining_text = remaining_text[:final_index]
+        law_text = remaining_text[:final_index]
 
-        return remaining_text
+        return law_text
     
     except:
         return None
@@ -70,11 +63,26 @@ def extract_data(html_string):
 
 
 # print out the matched lines 
-section_of_interest = extract_law_text(html) 
-extracted_data = extract_data(section_of_interest) 
-#print(extracted_data) 
+with open('/Users/jacobposada/columbia/econ research/district_sites.csv', newline='') as csvfile: 
+    dist_sites = csv.DictReader(csvfile) 
+
+    # cycle through district sites 
+    for site in dist_sites: 
+        url = site['Website'] 
+        page = requests.get(url) 
+        html = page.text 
+
+        # extract relevant text 
+        section_of_interest = extract_relevant_text(html) 
+
+        # format data 
+        extracted_data = extract_data(section_of_interest) 
+
+        # append district data to total data 
+        laws_data = [] 
+        laws_data.append(extracted_data) 
+
 
 # create pandas dataframe 
-laws_df = pd.DataFrame(extracted_data) 
-print(laws_df) 
+laws_df = pd.DataFrame(laws_data) 
 laws_df.to_excel('laws_data.xlsx') 
