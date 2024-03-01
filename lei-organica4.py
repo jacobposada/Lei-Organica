@@ -4,6 +4,9 @@ import requests
 from bs4 import BeautifulSoup 
 import csv 
 
+# website list 
+district_sites_csv = '/Users/jacobposada/columbia/econ research/district_sites.csv'
+
 
 def extract_relevant_text(soup: str) -> str:
     # extracts the law text from the HTML
@@ -57,8 +60,8 @@ def extract_data(html_string):
     return law_sections  
 
 
-# print out the matched lines 
-with open('/Users/jacobposada/columbia/econ research/district_sites.csv', newline='') as csvfile: 
+# go through each website 
+with open(district_sites_csv, newline='') as csvfile: 
     dist_sites = csv.DictReader(csvfile) 
 
     # cycle through district sites 
