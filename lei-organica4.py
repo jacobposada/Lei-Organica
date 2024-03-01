@@ -6,27 +6,22 @@ import csv
 
 
 def extract_relevant_text(soup: str) -> str:
-    
     # extracts the law text from the HTML
 
-    try:
-        # find beginning of text to extract
-        initial_index = re.search("atos administrativos de competência do Prefeito", soup).end()
+    # find beginning of text to extract
+    initial_index = re.search("atos administrativos de competência do Prefeito", soup).end()
 
-        # storing the remaining text
-        remaining_text = soup[initial_index:]
+    # storing the remaining text
+    remaining_text = soup[initial_index:]
 
-        # obtaining final index
-        final_index = re.search("artigo", remaining_text).start()
+    # obtaining final index
+    final_index = re.search("artigo", remaining_text).start()
 
-        # updating remaining text
-        law_text = remaining_text[:final_index]
+    # updating remaining text
+    law_text = remaining_text[:final_index]
 
-        return law_text
+    return law_text
     
-    except:
-        return None
-
 
 def extract_data(html_string): 
 
