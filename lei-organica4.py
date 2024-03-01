@@ -13,16 +13,9 @@ def parse_html(site):
     html = page.text 
     return html 
 
-def extract_district_name(soup: str) -> str: 
+#def extract_district_name(soup: str) -> str): 
     # extracts name of district from each site 
 
-    # pattern to detect, only captures "Municipio de ...."
-    pattern = re.compile(r'<h1>LEI ORGÂNICA DO (.*?).</h1>', re.DOTALL)
-
-    # find matches 
-    header_text = pattern.search(soup) 
-
-    return header_text.group(1) 
 
 
 def extract_relevant_text(soup: str) -> str:
@@ -44,7 +37,6 @@ def extract_relevant_text(soup: str) -> str:
     
 
 def extract_data(html_string): 
-    # separates and formats data 
 
     # parse html 
     soup = BeautifulSoup(html_string, 'html.parser')
@@ -52,7 +44,7 @@ def extract_data(html_string):
     # extract text from html 
     text = soup.get_text() 
 
-    # split text into sections based on roman numerals 
+    # split text into sections 
     section_split = re.split(r'\b(?=[IVXLCDM]+\b)', text) 
     section_split = [section.strip() for section in section_split if section.strip()]
 
@@ -73,7 +65,7 @@ def extract_data(html_string):
         for subsection in subsections: 
             subsec_letter, subsec_content = subsection 
             subsec_letter = subsec_letter[:1]
-            law_sections.append({'District Name': None,'Section Number': section_numeral, 'Section Content': section_content, 'Subsection Letter': subsec_letter, 'Subsection Content': subsec_content}) 
+            law_sections.append({'Section Number': section_numeral, 'Section Content': section_content, 'Subsection Letter': subsec_letter, 'Subsection Content': subsec_content}) 
     
     return law_sections  
 
@@ -91,17 +83,15 @@ with open(district_sites_csv, newline='') as csvfile:
         # extract relevant text 
         section_of_interest = extract_relevant_text(html) 
 
-        # extract district name 
-        dist_name = extract_district_name(html) 
-
         # format data 
         extracted_data = extract_data(section_of_interest) 
 
-        # append district name data to total data 
-        for entry in extracted_data: 
-            entry['District Name'] = dist_name 
+        # append district data to total data 
+        laws_data = [] 
+        laws_data.append(extracted_data) 
 
 
 # create pandas dataframe 
-laws_df = pd.DataFrame(extracted_data) 
+laws_df = pd.DataFrame(laws_data) 
+print (laws_df) 
 laws_df.to_excel('laws_data.xlsx') 
