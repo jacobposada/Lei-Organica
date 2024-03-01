@@ -7,6 +7,16 @@ import csv
 # website list 
 district_sites_csv = '/Users/jacobposada/columbia/econ research/district_sites.csv'
 
+def parse_html(site): 
+    url = site['Website'] 
+    page = requests.get(url) 
+    html = page.text 
+    return html 
+
+#def extract_district_name(soup: str) -> str): 
+    # extracts name of district from each site 
+
+
 
 def extract_relevant_text(soup: str) -> str:
     # extracts the law text from the HTML
@@ -66,9 +76,9 @@ with open(district_sites_csv, newline='') as csvfile:
 
     # cycle through district sites 
     for site in dist_sites: 
-        url = site['Website'] 
-        page = requests.get(url) 
-        html = page.text 
+        
+        # parse html code 
+        html = parse_html(site) 
 
         # extract relevant text 
         section_of_interest = extract_relevant_text(html) 
@@ -83,4 +93,5 @@ with open(district_sites_csv, newline='') as csvfile:
 
 # create pandas dataframe 
 laws_df = pd.DataFrame(laws_data) 
+print (laws_df) 
 laws_df.to_excel('laws_data.xlsx') 
