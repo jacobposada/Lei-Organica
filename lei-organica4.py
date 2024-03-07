@@ -8,9 +8,8 @@ import csv
 district_statuses = '/Users/jacobposada/columbia/econ research/Lei-Organica/leis_organicas_scraping_status.xlsx' 
 df = pd.read_excel(district_statuses, 'Sheet1')
 
-# change excel to list of dictionaries 
+# change excel sheet to list of dictionaries 
 district_sites = df.to_dict(orient='records')
-print(type(district_sites))
 
 
 def parse_html(site): 
@@ -26,7 +25,8 @@ def extract_district_name(soup: str) -> str:
     # extracts name of district from each site 
 
     # pattern to detect, only captures "Municipio de ...."
-    pattern = re.compile(r'<h1>LEI ORGÂNICA DO (.*?).</h1>', re.DOTALL)
+    pattern = re.compile(r'<title>Lei Orgânica de (.*?)</title>', re.DOTALL)
+    #pattern = re.compile(r'<h[0-9]>LEI ORGÂNICA DO (.*?).</h[0-9]>', re.DOTALL) 
 
     # find matches 
     header_text = pattern.search(soup) 
@@ -38,7 +38,8 @@ def extract_relevant_text(soup: str) -> str:
     # extracts the law text from the HTML
 
     # find beginning of text to extract 
-    initial_index = re.search("atos administrativos de competência do Prefeito", soup).end() 
+    match = re.search(r'atos administrativos de competência do Prefeito (.*?):', soup)
+    initial_index = match.end() 
 
     # storing the remaining text
     remaining_text = soup[initial_index:]
@@ -62,18 +63,28 @@ def extract_data(html_string):
     text = soup.get_text() 
 
     # split text into sections based on roman numerals 
-    section_split = re.split(r'\b(?=[IVXLCDM]+\b)', text) 
+    section_split = re.split(r'(?<!\S)(?=[IVXLCDM]+ - \b)', text) 
     section_split = [section.strip() for section in section_split if section.strip()]
 
     # extract subsections for each section 
     law_sections = []
     for section in section_split: 
+        print(section)
 
         # extract roman numeral 
         section_numeral = section[:section.index(' ')] 
 
-        # roman numeral string 
-        section_content = section[section.index(' ')+3:section.index(':')]
+        # section content string 
+        try: 
+            section_content = section[section.index('- '):section.index(' a)')] 
+        except: 
+            semicolon_index = section.find(';') 
+            period_index = section.find('. ') 
+            if semicolon_index != -1: 
+                end_index = semicolon_index 
+            else: 
+                end_index = period_index 
+            section_content = section[section.index('- '):end_index] 
         
         # isolate all the subsections 
         subsections = re.findall(r'([a-z]\) (.+?)(?=[a-z]\)|$))', section) 
