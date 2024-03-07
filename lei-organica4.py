@@ -26,7 +26,7 @@ def extract_district_name(soup: str) -> str:
 
     # pattern to detect, only captures "Municipio de ...."
     pattern = re.compile(r'<title>Lei Orgânica de (.*?)</title>', re.DOTALL)
-    #pattern = re.compile(r'<h[0-9]>LEI ORGÂNICA DO (.*?).</h[0-9]>', re.DOTALL) 
+        # pattern = re.compile(r'<h[0-9]>LEI ORGÂNICA DO (.*?).</h[0-9]>', re.DOTALL) 
 
     # find matches 
     header_text = pattern.search(soup) 
@@ -38,8 +38,12 @@ def extract_relevant_text(soup: str) -> str:
     # extracts the law text from the HTML
 
     # find beginning of text to extract 
-    match = re.search(r'atos administrativos de competência do Prefeito (.*?):', soup)
-    initial_index = match.end() 
+    try: 
+        match = re.search(r'atos administrativos de competência do Prefeito (.*?) I', soup)
+        initial_index = match.end() - 1 
+    except: 
+        match = re.search(r'atos administrativos de competência do Prefeito(.*?).', soup)
+        initial_index = match.end() 
 
     # storing the remaining text
     remaining_text = soup[initial_index:]
