@@ -39,7 +39,7 @@ def extract_relevant_text(soup: str) -> str:
 
     # find beginning of text to extract 
     try: 
-        match = re.search(r'atos administrativos de competência do Prefeito (.*?) I', soup)
+        match = re.search(r'atos administrativos de competência do Prefeito(.*?) I', soup)
         initial_index = match.end() - 1 
     except: 
         match = re.search(r'atos administrativos de competência do Prefeito(.*?).', soup)
@@ -66,8 +66,11 @@ def extract_data(html_string):
     # extract text from html 
     text = soup.get_text() 
 
-    # split text into sections based on roman numerals 
-    section_split = re.split(r'(?<!\S)(?=[IVXLCDM]+ - \b)', text) 
+    # split text into sections based on roman numerals or numbers 
+    try: 
+        section_split = re.split(r'(?<!\S)(?=[IVXLCDM]+ - \b)', text) 
+    except: 
+        section_split = re.split(r'(?<!\S)(?=[0-9]+. \b)')
     section_split = [section.strip() for section in section_split if section.strip()]
 
     # extract subsections for each section 
