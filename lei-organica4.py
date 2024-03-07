@@ -5,15 +5,19 @@ from bs4 import BeautifulSoup
 import csv 
 
 # website list 
-district_sites_csv = '/Users/jacobposada/columbia/econ research/district_sites.csv'
+district_statuses = '/Users/jacobposada/columbia/econ research/Lei-Organica/leis_organicas_scraping_status.xlsx' 
+df = pd.read_excel(district_statuses, 'Sheet1')
 
-
+# change excel to list of dictionaries 
+district_sites = df.to_dict(orient='records')
+print(type(district_sites))
 
 
 def parse_html(site): 
     # parses through html text from the Website column of a site file 
 
-    url = site['Website'] 
+    url = 'https://leismunicipais.com.br/' + site['city_code']
+    print(url) 
     page = requests.get(url) 
     html = page.text 
     return html 
@@ -33,8 +37,8 @@ def extract_district_name(soup: str) -> str:
 def extract_relevant_text(soup: str) -> str:
     # extracts the law text from the HTML
 
-    # find beginning of text to extract
-    initial_index = re.search("atos administrativos de competência do Prefeito", soup).end()
+    # find beginning of text to extract 
+    initial_index = re.search("atos administrativos de competência do Prefeito", soup).end() 
 
     # storing the remaining text
     remaining_text = soup[initial_index:]
@@ -84,27 +88,24 @@ def extract_data(html_string):
 
 
 # go through each website 
-with open(district_sites_csv, newline='') as csvfile: 
-    dist_sites = csv.DictReader(csvfile) 
-
     # cycle through district sites 
-    for site in dist_sites: 
-        
-        # parse html code 
-        html = parse_html(site) 
-
-        # extract relevant text 
-        section_of_interest = extract_relevant_text(html) 
-
-        # extract district name 
-        dist_name = extract_district_name(html) 
-
-        # format data 
-        extracted_data = extract_data(section_of_interest) 
-
-        # append district name data to total data 
-        for entry in extracted_data: 
-            entry['District Name'] = dist_name 
+for site in district_sites: 
+    if site['status'] == 'success': 
+            # parse html code 
+            html = parse_html(site) 
+            
+            # extract relevant text 
+            section_of_interest = extract_relevant_text(html) 
+            
+            # extract district name 
+            dist_name = extract_district_name(html) 
+            
+            # format data 
+            extracted_data = extract_data(section_of_interest) 
+            
+            # append district name data to total data 
+            for entry in extracted_data: 
+                entry['District Name'] = dist_name 
 
 
 # create pandas dataframe 
