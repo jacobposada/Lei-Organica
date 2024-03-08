@@ -32,6 +32,7 @@ def extract_district_name(soup: str) -> str:
 
     # find matches 
     header_text = pattern.search(soup) 
+    print(header_text.group(1))
 
     if header_text == None: 
         pattern = re.compile(r'<title>Leis de (.*?)</title>', re.DOTALL) 
@@ -87,7 +88,7 @@ def extract_data(html_string):
 
         # section content string 
         try: 
-            section_content = section[section.index('- '):section.index(' a)')] 
+            section_content = section[section.index('- ')+2:section.index(' a)')] 
         except: 
             semicolon_index = section.find(';') 
             period_index = section.find('. ') 
@@ -95,7 +96,7 @@ def extract_data(html_string):
                 end_index = semicolon_index 
             else: 
                 end_index = period_index 
-            section_content = section[section.index('- '):end_index] 
+            section_content = section[section.index('- ')+2:end_index] 
         
         # isolate all the subsections 
         subsections = re.findall(r'([a-z]\) (.+?)(?=[a-z]\)|$))', section) 
@@ -104,7 +105,7 @@ def extract_data(html_string):
         for subsection in subsections: 
             subsec_letter, subsec_content = subsection 
             subsec_letter = subsec_letter[:1]
-            law_sections.append({'District Name': None,'Section Number': section_numeral, 'Section Content': section_content, 'Subsection Letter': subsec_letter, 'Subsection Content': subsec_content}) 
+            law_sections.append({'District Name': dist_name,'Section Number': section_numeral, 'Section Content': section_content, 'Subsection Letter': subsec_letter, 'Subsection Content': subsec_content}) 
     
     return law_sections  
 
@@ -115,6 +116,9 @@ for site in district_sites:
     if site['status'] == 'success': 
             # parse html code 
             html = parse_html(site) 
+
+            # extract district name 
+            dist_name = extract_district_name(html) 
             
             # extract relevant text 
             try: 
@@ -124,13 +128,10 @@ for site in district_sites:
                 extracted_data = extract_data(section_of_interest) 
             
             except: 
-                law_sections.append({'District Name': None, 'Section Number': 'Error: No data found on website', 'Section Content': None, 'Subsection Letter': None, 'Subsection Content': None})
-            
-            # extract district name 
-            dist_name = extract_district_name(html) 
+                law_sections.append({'District Name': dist_name, 'Section Number': 'Error: No data found on website', 'Section Content': None, 'Subsection Letter': None, 'Subsection Content': None})
             
             # append district name data to total data 
-            site['District Name'] = dist_name 
+            # site['District Name'] = dist_name 
 
 
 # create pandas dataframe 
