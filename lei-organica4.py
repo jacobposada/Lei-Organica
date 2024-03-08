@@ -2,7 +2,6 @@ import pandas as pd
 import re 
 import requests 
 from bs4 import BeautifulSoup 
-import csv 
 
 # website list 
 district_statuses = '/Users/jacobposada/columbia/econ research/Lei-Organica/leis_organicas_scraping_status.xlsx' 
