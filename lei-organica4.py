@@ -11,6 +11,9 @@ df = pd.read_excel(district_statuses, 'Sheet1')
 # change excel sheet to list of dictionaries 
 district_sites = df.to_dict(orient='records')
 
+# database to store in 
+law_sections = [] 
+
 
 def parse_html(site): 
     # parses through html text from the Website column of a site file 
@@ -31,6 +34,10 @@ def extract_district_name(soup: str) -> str:
     # find matches 
     header_text = pattern.search(soup) 
 
+    if header_text == None: 
+        pattern = re.compile(r'<title>Leis de (.*?)</title>', re.DOTALL) 
+        header_text = pattern.search(soup) 
+
     return header_text.group(1) 
 
 
@@ -39,8 +46,8 @@ def extract_relevant_text(soup: str) -> str:
 
     # find beginning of text to extract 
     try: 
-        match = re.search(r'atos administrativos de competência do Prefeito(.*?) I', soup)
-        initial_index = match.end() - 1 
+        match = re.search(r'atos administrativos de competência do Prefeito(.*?) I -', soup)
+        initial_index = match.end() - 3
     except: 
         match = re.search(r'atos administrativos de competência do Prefeito(.*?).', soup)
         initial_index = match.end() 
@@ -74,9 +81,7 @@ def extract_data(html_string):
     section_split = [section.strip() for section in section_split if section.strip()]
 
     # extract subsections for each section 
-    law_sections = []
     for section in section_split: 
-        print(section)
 
         # extract roman numeral 
         section_numeral = section[:section.index(' ')] 
@@ -113,19 +118,22 @@ for site in district_sites:
             html = parse_html(site) 
             
             # extract relevant text 
-            section_of_interest = extract_relevant_text(html) 
+            try: 
+                section_of_interest = extract_relevant_text(html) 
+
+                # format data 
+                extracted_data = extract_data(section_of_interest) 
+            
+            except: 
+                law_sections.append({'District Name': None, 'Section Number': 'Error: No data found on website', 'Section Content': None, 'Subsection Letter': None, 'Subsection Content': None})
             
             # extract district name 
             dist_name = extract_district_name(html) 
             
-            # format data 
-            extracted_data = extract_data(section_of_interest) 
-            
             # append district name data to total data 
-            for entry in extracted_data: 
-                entry['District Name'] = dist_name 
+            site['District Name'] = dist_name 
 
 
 # create pandas dataframe 
-laws_df = pd.DataFrame(extracted_data) 
+laws_df = pd.DataFrame(law_sections) 
 laws_df.to_excel('laws_data.xlsx') 
