@@ -32,7 +32,6 @@ def extract_district_name(soup: str) -> str:
 
     # find matches 
     header_text = pattern.search(soup) 
-    print(header_text.group(1))
 
     if header_text == None: 
         pattern = re.compile(r'<title>Leis de (.*?)</title>', re.DOTALL) 
